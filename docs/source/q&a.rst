@@ -4,6 +4,12 @@ Q & A
 移植提问模板
 ----------------
 
+请在下列途径提交问题：
+- RT-Thread 官方论坛: https://club.rt-thread.org/ask/tag/5f5f851966917b14.html
+- Github issue: https://github.com/cherry-embedded/CherryUSB/issues/new/choose
+
+提问中请包含以下信息：
+
 - 使用的板子，引脚，USB IP
 - USB 中断，时钟，引脚，寄存器地址是否正确，截图
 - 是否能进 USB 中断
