@@ -21,10 +21,12 @@
 /* Enable print with color */
 #define CONFIG_USB_PRINTF_COLOR_ENABLE
 
-/* data align size when use dma */
+/* data align size when use dma or use dcache */
 #ifndef CONFIG_USB_ALIGN_SIZE
 #define CONFIG_USB_ALIGN_SIZE 4
 #endif
+
+//#define CONFIG_USB_DCACHE_ENABLE
 
 /* attribute data into no cache ram */
 #define USB_NOCACHE_RAM_SECTION __attribute__((section(".noncacheable")))
@@ -49,6 +51,20 @@
 
 /* Enable test mode */
 // #define CONFIG_USBDEV_TEST_MODE
+
+/* enable advance desc register api */
+// CONFIG_USBDEV_ADVANCE_DESC
+
+/* move ep0 setup handler from isr to thread */
+// #define CONFIG_USBDEV_EP0_THREAD
+
+#ifndef CONFIG_USBDEV_EP0_PRIO
+#define CONFIG_USBDEV_EP0_PRIO 4
+#endif
+
+#ifndef CONFIG_USBDEV_EP0_STACKSIZE
+#define CONFIG_USBDEV_EP0_STACKSIZE 2048
+#endif
 
 #ifndef CONFIG_USBDEV_MSC_MAX_LUN
 #define CONFIG_USBDEV_MSC_MAX_LUN 1
@@ -212,6 +228,9 @@
 #define CONFIG_USBDEV_EP_NUM 8
 #endif
 
+/* When your chip hardware supports high-speed and wants to initialize it in high-speed mode, the relevant IP will configure the internal or external high-speed PHY according to CONFIG_USB_HS. */
+// #define CONFIG_USB_HS
+
 /* ---------------- FSDEV Configuration ---------------- */
 //#define CONFIG_USBDEV_FSDEV_PMA_ACCESS 2 // maybe 1 or 2, many chips may have a difference
 
@@ -256,9 +275,13 @@
 // #define CONFIG_USB_EHCI_CONFIGFLAG
 // #define CONFIG_USB_EHCI_ISO
 // #define CONFIG_USB_EHCI_WITH_OHCI
+// #define CONFIG_USB_EHCI_DESC_DCACHE_ENABLE
 
 /* ---------------- OHCI Configuration ---------------- */
 #define CONFIG_USB_OHCI_HCOR_OFFSET (0x0)
+#define CONFIG_USB_OHCI_ED_NUM CONFIG_USBHOST_PIPE_NUM
+#define CONFIG_USB_OHCI_TD_NUM 3
+// #define CONFIG_USB_OHCI_DESC_DCACHE_ENABLE
 
 /* ---------------- XHCI Configuration ---------------- */
 #define CONFIG_USB_XHCI_HCCR_OFFSET (0x0)
@@ -276,5 +299,27 @@
 
 /* ---------------- MUSB Configuration ---------------- */
 // #define CONFIG_USB_MUSB_SUNXI
+
+/* ================ USB Dcache Configuration ==================*/
+
+#ifdef CONFIG_USB_DCACHE_ENABLE
+/* style 1*/
+// void usb_dcache_clean(uintptr_t addr, uint32_t size);
+// void usb_dcache_invalidate(uintptr_t addr, uint32_t size);
+// void usb_dcache_flush(uintptr_t addr, uint32_t size);
+
+/* style 2*/
+// #define usb_dcache_clean(addr, size)
+// #define usb_dcache_invalidate(addr, size)
+// #define usb_dcache_flush(addr, size)
+#endif
+
+#ifndef usb_phyaddr2ramaddr
+#define usb_phyaddr2ramaddr(addr) (addr)
+#endif
+
+#ifndef usb_ramaddr2phyaddr
+#define usb_ramaddr2phyaddr(addr) (addr)
+#endif
 
 #endif

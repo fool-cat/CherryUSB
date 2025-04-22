@@ -31,22 +31,35 @@
 #define CONFIG_USB_EHCI_ISO_NUM  4
 #endif
 
-extern uint8_t usbh_get_port_speed(struct usbh_bus *bus, const uint8_t port);
+#if CONFIG_USB_ALIGN_SIZE <= 32
+#define CONFIG_USB_EHCI_ALIGN_SIZE  32
+#elif CONFIG_USB_ALIGN_SIZE <= 64
+#define CONFIG_USB_EHCI_ALIGN_SIZE  64
+#else
+#error "CONFIG_USB_ALIGN_SIZE must be 32 or 64"
+#endif
 
 struct ehci_qtd_hw {
     struct ehci_qtd hw;
+#if defined(CONFIG_USB_EHCI_DESC_DCACHE_ENABLE) && (CONFIG_USB_ALIGN_SIZE == 64)
+    uint8_t pad[32];
+#endif
     struct usbh_urb *urb;
+    uintptr_t bufaddr;
     uint32_t length;
-} __attribute__((aligned(32)));
+} __attribute__((aligned(CONFIG_USB_EHCI_ALIGN_SIZE)));
 
 struct ehci_qh_hw {
     struct ehci_qh hw;
+#if defined(CONFIG_USB_EHCI_DESC_DCACHE_ENABLE)
+    uint16_t pad[16];
+#endif
     struct ehci_qtd_hw qtd_pool[CONFIG_USB_EHCI_QTD_NUM];
     uint32_t first_qtd;
     struct usbh_urb *urb;
     usb_osal_sem_t waitsem;
     uint8_t remove_in_iaad;
-} __attribute__((aligned(32)));
+} __attribute__((aligned(CONFIG_USB_EHCI_ALIGN_SIZE)));
 
 struct ehci_itd_hw {
     struct ehci_itd hw;
@@ -55,7 +68,8 @@ struct ehci_itd_hw {
     uint8_t mf_unmask;
     uint8_t mf_valid;
     uint32_t pkt_idx[8];
-} __attribute__((aligned(32)));
+    bool dir_in;
+} __attribute__((aligned(CONFIG_USB_EHCI_ALIGN_SIZE)));
 
 struct ehci_iso_hw
 {
@@ -76,6 +90,7 @@ struct ehci_hcd {
 
 extern struct ehci_hcd g_ehci_hcd[CONFIG_USBHOST_MAX_BUS];
 extern uint32_t g_framelist[CONFIG_USBHOST_MAX_BUS][USB_ALIGN_UP(CONFIG_USB_EHCI_FRAME_LIST_SIZE, 1024)];
+extern uint8_t usbh_get_port_speed(struct usbh_bus *bus, const uint8_t port);
 
 int ehci_iso_urb_init(struct usbh_bus *bus, struct usbh_urb *urb);
 void ehci_kill_iso_urb(struct usbh_bus *bus, struct usbh_urb *urb);

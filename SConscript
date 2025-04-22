@@ -1,18 +1,23 @@
 from building import *
 
 cwd = GetCurrentDir()
-path = [cwd + '/common']
+path = [cwd]
+path += [cwd + '/common']
 path += [cwd + '/core']
+path += [cwd + '/class/hub']
 path += [cwd + '/class/cdc']
 path += [cwd + '/class/msc']
 path += [cwd + '/class/hid']
 path += [cwd + '/class/audio']
 path += [cwd + '/class/video']
 path += [cwd + '/class/wireless']
+path += [cwd + '/class/midi']
+path += [cwd + '/class/adb']
 path += [cwd + '/class/dfu']
 path += [cwd + '/class/midi']
 path += [cwd + '/class/vendor/net']
 path += [cwd + '/class/vendor/serial']
+path += [cwd + '/class/vendor/wifi']
 src = []
 
 LIBS    = []
@@ -45,6 +50,9 @@ if GetDepend(['PKG_CHERRYUSB_DEVICE']):
     if GetDepend(['PKG_CHERRYUSB_DEVICE_DWC2_HC']):
         src += Glob('port/dwc2/usb_dc_dwc2.c')
         src += Glob('port/dwc2/usb_glue_hc.c')
+    if GetDepend(['PKG_CHERRYUSB_DEVICE_DWC2_KENDRYTE']):
+        src += Glob('port/dwc2/usb_dc_dwc2.c')
+        src += Glob('port/dwc2/usb_glue_kendryte.c')
     if GetDepend(['PKG_CHERRYUSB_DEVICE_DWC2_CUSTOM']):
         src += Glob('port/dwc2/usb_dc_dwc2.c')
     if GetDepend(['PKG_CHERRYUSB_DEVICE_MUSB_ES']):
@@ -79,7 +87,7 @@ if GetDepend(['PKG_CHERRYUSB_DEVICE']):
         else:
             src += Glob('port/ch32/usb_dc_usbfs.c')
     if GetDepend(['PKG_CHERRYUSB_DEVICE_PUSB2']):
-        path += [cwd + '/port/xhci/rt-thread']
+        path += [cwd + '/port/pusb2/rt-thread']
         src += Glob('port/pusb2/rt-thread/usb_dc_glue_phytium.c')
         if GetDepend(['ARCH_ARMV8']):
             LIBPATH = [cwd + '/port/pusb2']
@@ -111,6 +119,8 @@ if GetDepend(['PKG_CHERRYUSB_DEVICE']):
         src += Glob('demo/cdc_acm_template.c')
     if GetDepend(['PKG_CHERRYUSB_DEVICE_TEMPLATE_MSC']):
         src += Glob('demo/msc_ram_template.c')
+    if GetDepend(['PKG_CHERRYUSB_DEVICE_TEMPLATE_MSC_BLKDEV']):
+        src += Glob('platform/rtthread/usbd_msc_blkdev.c')
     if GetDepend(['PKG_CHERRYUSB_DEVICE_TEMPLATE_HID_MOUSE']):
         src += Glob('demo/hid_mouse_template.c')
     if GetDepend(['PKG_CHERRYUSB_DEVICE_TEMPLATE_HID_KEYBOARD']):
@@ -142,7 +152,6 @@ if GetDepend(['PKG_CHERRYUSB_DEVICE']):
 
 # USB HOST
 if GetDepend(['PKG_CHERRYUSB_HOST']):
-    path += [cwd + '/class/hub']
     src += Glob('core/usbh_core.c')
     src += Glob('class/hub/usbh_hub.c')
     src += Glob('osal/usb_osal_rtthread.c')
@@ -177,6 +186,9 @@ if GetDepend(['PKG_CHERRYUSB_HOST']):
     if GetDepend(['PKG_CHERRYUSB_HOST_DWC2_ESP']):
         src += Glob('port/dwc2/usb_hc_dwc2.c')
         src += Glob('port/dwc2/usb_glue_esp.c')
+    if GetDepend(['PKG_CHERRYUSB_HOST_DWC2_KENDRYTE']):
+        src += Glob('port/dwc2/usb_hc_dwc2.c')
+        src += Glob('port/dwc2/usb_glue_kendryte.c')
     if GetDepend(['PKG_CHERRYUSB_HOST_DWC2_CUSTOM']):
         src += Glob('port/dwc2/usb_hc_dwc2.c')
     if GetDepend(['PKG_CHERRYUSB_HOST_MUSB_STANDARD']):

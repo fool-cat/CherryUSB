@@ -8,7 +8,7 @@
 
 #define DEV_FORMAT "/dev/ttyUSB%d"
 
-USB_NOCACHE_RAM_SECTION USB_MEM_ALIGNX uint8_t g_cp210x_buf[64];
+USB_NOCACHE_RAM_SECTION USB_MEM_ALIGNX uint8_t g_cp210x_buf[USB_ALIGN_UP(64, CONFIG_USB_ALIGN_SIZE)];
 
 #define CONFIG_USBHOST_MAX_CP210X_CLASS 1
 
@@ -319,9 +319,9 @@ const struct usbh_class_driver cp210x_class_driver = {
 
 CLASS_INFO_DEFINE const struct usbh_class_info cp210x_class_info = {
     .match_flags = USB_CLASS_MATCH_VID_PID | USB_CLASS_MATCH_INTF_CLASS,
-    .class = 0xff,
-    .subclass = 0x00,
-    .protocol = 0x00,
+    .bInterfaceClass = 0xff,
+    .bInterfaceSubClass = 0x00,
+    .bInterfaceProtocol = 0x00,
     .id_table = cp210x_id_table,
     .class_driver = &cp210x_class_driver
 };
